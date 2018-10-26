@@ -4,6 +4,11 @@
 #
 
 cmake_minimum_required(VERSION 3.1)
+include("cmake/HunterGate.cmake")
+HunterGate(
+    URL "https://github.com/ruslo/hunter/archive/v0.20.64.tar.gz"
+    SHA1 "7b830dfda7a094b2af15f44b24ebd2489404d880"
+)
 project(spdlog VERSION 1.3.1 LANGUAGES CXX)
 include(CMakeDependentOption)
 include(GNUInstallDirs)
@@ -30,7 +35,6 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" OR "${CMAKE_CXX_COMPILER_ID}" MATCH
     add_compile_options("-Wconversion")
     add_compile_options("-pedantic")
     add_compile_options("-Wfatal-errors")
-    
 endif()
 
 #---------------------------------------------------------------------------------------
@@ -56,6 +60,7 @@ option(SPDLOG_BUILD_TESTS "Build tests" ${SPDLOG_MASTER_PROJECT})
 option(SPDLOG_FMT_EXTERNAL "Use external fmt library instead of bundled" OFF)
 
 if(SPDLOG_FMT_EXTERNAL)
+    hunter_add_package(fmt)
     find_package(fmt REQUIRED CONFIG)
 endif()
 
@@ -108,13 +113,19 @@ write_basic_package_version_file(
 
 # configure pkg config file
 configure_file("cmake/spdlog.pc.in" "${pkg_config}" @ONLY)
-# configure spdlogConfig.cmake file
-configure_file("cmake/Config.cmake.in" "${project_config}" @ONLY)
 
 # install targets
+# Note: use 'targets_export_name'
+configure_package_config_file(
+    "cmake/Config.cmake.in"
+    "${project_config}"
+    INSTALL_DESTINATION "${config_install_dir}"
+)
+
 install(
     TARGETS spdlog
     EXPORT "${targets_export_name}"
+    INCLUDES DESTINATION "${include_install_dir}"
 )
 
 # install headers
