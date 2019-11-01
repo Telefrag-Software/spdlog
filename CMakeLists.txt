@@ -5,6 +5,7 @@ cmake_minimum_required(VERSION 3.10...3.21)
 # ---------------------------------------------------------------------------------------
 # Start spdlog project
 # ---------------------------------------------------------------------------------------
+include(cmake/Hunter/HunterInit.cmake)
 include(cmake/utils.cmake)
 include(cmake/ide.cmake)
 
@@ -199,7 +200,8 @@ target_link_libraries(spdlog_header_only INTERFACE Threads::Threads)
 # ---------------------------------------------------------------------------------------
 if(SPDLOG_FMT_EXTERNAL OR SPDLOG_FMT_EXTERNAL_HO)
     if(NOT TARGET fmt::fmt)
-        find_package(fmt CONFIG REQUIRED)
+        hunter_add_package(fmt)
+        find_package(fmt REQUIRED CONFIG)
     endif()
     target_compile_definitions(spdlog PUBLIC SPDLOG_FMT_EXTERNAL)
     target_compile_definitions(spdlog_header_only INTERFACE SPDLOG_FMT_EXTERNAL)
